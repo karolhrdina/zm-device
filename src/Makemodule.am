@@ -22,6 +22,7 @@ include_HEADERS += \
 
 endif
 src_libzm_device_la_SOURCES = \
+    src/zm_devices.c \
     src/platform.h
 
 if ENABLE_DRAFTS
