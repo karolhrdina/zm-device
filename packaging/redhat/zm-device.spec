@@ -22,7 +22,7 @@
 Name:           zm-device
 Version:        1.0.0
 Release:        1
-Summary:        device management component
+Summary:        Device management component
 License:        MIT
 URL:            http://example.com/
 Source0:        %{name}-%{version}.tar.gz

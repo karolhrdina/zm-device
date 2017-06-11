@@ -15,8 +15,8 @@
     =========================================================================
 */
 
-#ifndef ZM_ASSET_LIBRARY_H_INCLUDED
-#define ZM_ASSET_LIBRARY_H_INCLUDED
+#ifndef ZM_DEVICE_LIBRARY_H_INCLUDED
+#define ZM_DEVICE_LIBRARY_H_INCLUDED
 
 //  Set up environment for the application
 
@@ -25,63 +25,63 @@
 #include <malamute.h>
 #include <zmproto.h>
 
-//  ZM_ASSET version macros for compile-time API detection
-#define ZM_ASSET_VERSION_MAJOR 1
-#define ZM_ASSET_VERSION_MINOR 0
-#define ZM_ASSET_VERSION_PATCH 0
+//  ZM_DEVICE version macros for compile-time API detection
+#define ZM_DEVICE_VERSION_MAJOR 1
+#define ZM_DEVICE_VERSION_MINOR 0
+#define ZM_DEVICE_VERSION_PATCH 0
 
-#define ZM_ASSET_MAKE_VERSION(major, minor, patch) \
+#define ZM_DEVICE_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
-#define ZM_ASSET_VERSION \
-    ZM_ASSET_MAKE_VERSION(ZM_ASSET_VERSION_MAJOR, ZM_ASSET_VERSION_MINOR, ZM_ASSET_VERSION_PATCH)
+#define ZM_DEVICE_VERSION \
+    ZM_DEVICE_MAKE_VERSION(ZM_DEVICE_VERSION_MAJOR, ZM_DEVICE_VERSION_MINOR, ZM_DEVICE_VERSION_PATCH)
 
 #if defined (__WINDOWS__)
-#   if defined ZM_ASSET_STATIC
-#       define ZM_ASSET_EXPORT
-#   elif defined ZM_ASSET_INTERNAL_BUILD
+#   if defined ZM_DEVICE_STATIC
+#       define ZM_DEVICE_EXPORT
+#   elif defined ZM_DEVICE_INTERNAL_BUILD
 #       if defined DLL_EXPORT
-#           define ZM_ASSET_EXPORT __declspec(dllexport)
+#           define ZM_DEVICE_EXPORT __declspec(dllexport)
 #       else
-#           define ZM_ASSET_EXPORT
+#           define ZM_DEVICE_EXPORT
 #       endif
-#   elif defined ZM_ASSET_EXPORTS
-#       define ZM_ASSET_EXPORT __declspec(dllexport)
+#   elif defined ZM_DEVICE_EXPORTS
+#       define ZM_DEVICE_EXPORT __declspec(dllexport)
 #   else
-#       define ZM_ASSET_EXPORT __declspec(dllimport)
+#       define ZM_DEVICE_EXPORT __declspec(dllimport)
 #   endif
-#   define ZM_ASSET_PRIVATE
+#   define ZM_DEVICE_PRIVATE
 #else
-#   define ZM_ASSET_EXPORT
+#   define ZM_DEVICE_EXPORT
 #   if (defined __GNUC__ && __GNUC__ >= 4) || defined __INTEL_COMPILER
-#       define ZM_ASSET_PRIVATE __attribute__ ((visibility ("hidden")))
+#       define ZM_DEVICE_PRIVATE __attribute__ ((visibility ("hidden")))
 #   else
-#       define ZM_ASSET_PRIVATE
+#       define ZM_DEVICE_PRIVATE
 #   endif
 #endif
 
 //  Project has no stable classes, so we build the draft API
-#undef  ZM_ASSET_BUILD_DRAFT_API
-#define ZM_ASSET_BUILD_DRAFT_API
+#undef  ZM_DEVICE_BUILD_DRAFT_API
+#define ZM_DEVICE_BUILD_DRAFT_API
 
 //  Opaque class structures to allow forward references
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
-#ifdef ZM_ASSET_BUILD_DRAFT_API
+#ifdef ZM_DEVICE_BUILD_DRAFT_API
 typedef struct _zm_device_t zm_device_t;
-#define ZM_ASSET_T_DEFINED
-#endif // ZM_ASSET_BUILD_DRAFT_API
+#define ZM_DEVICE_T_DEFINED
+#endif // ZM_DEVICE_BUILD_DRAFT_API
 
 
 //  Public classes, each with its own header file
-#ifdef ZM_ASSET_BUILD_DRAFT_API
+#ifdef ZM_DEVICE_BUILD_DRAFT_API
 #include "zm_device.h"
-#endif // ZM_ASSET_BUILD_DRAFT_API
+#endif // ZM_DEVICE_BUILD_DRAFT_API
 
-#ifdef ZM_ASSET_BUILD_DRAFT_API
+#ifdef ZM_DEVICE_BUILD_DRAFT_API
 //  Self test for private classes
-ZM_ASSET_EXPORT void
+ZM_DEVICE_EXPORT void
     zm_device_private_selftest (bool verbose);
-#endif // ZM_ASSET_BUILD_DRAFT_API
+#endif // ZM_DEVICE_BUILD_DRAFT_API
 
 #endif
 /*

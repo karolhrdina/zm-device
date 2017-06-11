@@ -27,13 +27,13 @@ typedef struct {
 
 static test_item_t
 all_tests [] = {
-#ifdef ZM_ASSET_BUILD_DRAFT_API
+#ifdef ZM_DEVICE_BUILD_DRAFT_API
 // Tests for draft public classes:
     { "zm_device", zm_device_test },
-#endif // ZM_ASSET_BUILD_DRAFT_API
-#ifdef ZM_ASSET_BUILD_DRAFT_API
+#endif // ZM_DEVICE_BUILD_DRAFT_API
+#ifdef ZM_DEVICE_BUILD_DRAFT_API
     { "private_classes", zm_device_private_selftest },
-#endif // ZM_ASSET_BUILD_DRAFT_API
+#endif // ZM_DEVICE_BUILD_DRAFT_API
     {0, 0}          //  Sentinel
 };
 

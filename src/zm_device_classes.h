@@ -14,8 +14,8 @@
     =========================================================================
 */
 
-#ifndef ZM_ASSET_CLASSES_H_INCLUDED
-#define ZM_ASSET_CLASSES_H_INCLUDED
+#ifndef ZM_DEVICE_CLASSES_H_INCLUDED
+#define ZM_DEVICE_CLASSES_H_INCLUDED
 
 //  Platform definitions, must come first
 #include "platform.h"
@@ -35,17 +35,17 @@ typedef struct _zm_devices_t zm_devices_t;
 #include "zm_devices.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
-#ifndef ZM_ASSET_BUILD_DRAFT_API
+#ifndef ZM_DEVICE_BUILD_DRAFT_API
 
 //  *** Draft method, defined for internal use only ***
 //  Self test of this class.
-ZM_ASSET_PRIVATE void
+ZM_DEVICE_PRIVATE void
     zm_devices_test (bool verbose);
 
 //  Self test for private classes
-ZM_ASSET_PRIVATE void
+ZM_DEVICE_PRIVATE void
     zm_device_private_selftest (bool verbose);
 
-#endif // ZM_ASSET_BUILD_DRAFT_API
+#endif // ZM_DEVICE_BUILD_DRAFT_API
 
 #endif

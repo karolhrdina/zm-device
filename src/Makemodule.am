@@ -60,7 +60,7 @@ if WITH_SYSTEMD_UNITS
 systemdsystemunit_DATA =
 endif #WITH_SYSTEMD_UNITS
 
-if ENABLE_ZMASSET
+if ENABLE_ZMDEVICE
 bin_PROGRAMS += src/zmdevice
 src_zmdevice_CPPFLAGS = ${AM_CPPFLAGS}
 src_zmdevice_LDADD = ${program_libs}
@@ -71,15 +71,15 @@ src_zmdevice_configdir = $(sysconfdir)/zm-device
 if WITH_SYSTEMD_UNITS
 systemdsystemunit_DATA += src/zmdevice.service
 endif #WITH_SYSTEMD_UNITS
-endif #ENABLE_ZMASSET
+endif #ENABLE_ZMDEVICE
 
-if ENABLE_ZM_ASSET_SELFTEST
+if ENABLE_ZM_DEVICE_SELFTEST
 check_PROGRAMS += src/zm_device_selftest
 noinst_PROGRAMS += src/zm_device_selftest
 src_zm_device_selftest_CPPFLAGS = ${AM_CPPFLAGS}
 src_zm_device_selftest_LDADD = ${program_libs}
 src_zm_device_selftest_SOURCES = src/zm_device_selftest.c
-endif #ENABLE_ZM_ASSET_SELFTEST
+endif #ENABLE_ZM_DEVICE_SELFTEST
 
 # define custom target for all products of /src
 src: \

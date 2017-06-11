@@ -10,8 +10,8 @@
     =========================================================================
 */
 
-#ifndef ZMASSET_H_H_INCLUDED
-#define ZMASSET_H_H_INCLUDED
+#ifndef ZMDEVICE_H_H_INCLUDED
+#define ZMDEVICE_H_H_INCLUDED
 
 //  Include the project library file
 #include "zm_device_library.h"
