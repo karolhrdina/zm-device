@@ -347,12 +347,13 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
     assert (self);
 
     const char *subject = mlm_client_subject (self->client);
-    zmsg_t *msg = zmsg_new ();
+    zm_proto_t *msg = self->msg;    // message to send
+    zm_proto_t *reply = NULL;
+
     if (streq (subject, "INSERT")) {
         zm_devices_insert (self->devices, self->msg);
         zm_device_publish (self, self->msg, subject);
         zm_proto_encode_ok (self->msg);
-        zm_proto_send (self->msg, msg);
     }
     else
     if (streq (subject, "DELETE")) {
@@ -360,31 +361,25 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
         zm_devices_delete (self->devices, device);
         zm_device_publish (self, self->msg, subject);
         zm_proto_encode_ok (self->msg);
-        zm_proto_send (self->msg, msg);
     }
     else
     if (streq (subject, "LOOKUP")) {
         const char *device = zm_proto_device (self->msg);
-        zm_proto_t *reply = zm_devices_lookup (self->devices, device);
+        reply = zm_devices_lookup (self->devices, device);
 
         if (reply)
-            zm_proto_send (reply, msg);
-        else {
+            msg = reply;
+        else
             zm_proto_encode_error (self->msg, 404, "Requested device does not exists");
-            zm_proto_send (self->msg, msg);
-        }
     }
-    else {
+    else
         zm_proto_encode_error (self->msg, 403, "Subject not found");
-        zm_proto_send (self->msg, msg);
-    }
-    mlm_client_sendto (
+
+    zm_proto_sendto (
+        msg,
         self->client,
         mlm_client_sender (self->client),
-        "LOOKUP",
-        NULL,
-        5000,
-        &msg);
+        "LOOKUP");
 }
 
 static void
