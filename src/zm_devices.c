@@ -101,6 +101,24 @@ zm_devices_set_file (zm_devices_t *self, const char *file)
     self->file = strdup (file);
 }
 
+zm_proto_t *zm_devices_first (zm_devices_t *self)
+{
+    assert (self);
+    return (zm_proto_t *) zhashx_first (self->devices);
+}
+
+zm_proto_t *zm_devices_next (zm_devices_t *self)
+{
+    assert (self);
+    return (zm_proto_t *) zhashx_next (self->devices);
+}
+
+size_t zm_devices_size (zm_devices_t *self)
+{
+    assert (self);
+    return zhashx_size (self->devices);
+}
+
 int
 zm_devices_store (zm_devices_t *self)
 {

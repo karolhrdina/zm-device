@@ -34,6 +34,15 @@ zm_devices_file (zm_devices_t *self);
 ZM_DEVICE_PRIVATE void
 zm_devices_set_file (zm_devices_t *self, const char *file);
 
+ZM_DEVICE_PRIVATE zm_proto_t*
+    zm_devices_first (zm_devices_t *self);
+
+ZM_DEVICE_PRIVATE zm_proto_t*
+    zm_devices_next (zm_devices_t *self);
+
+ZM_DEVICE_PRIVATE size_t
+    zm_devices_size (zm_devices_t *self);
+
 //  Store devices
 ZM_DEVICE_PRIVATE int
 zm_devices_store (zm_devices_t *self);

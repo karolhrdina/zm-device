@@ -36,6 +36,11 @@ In this mode actor provide three commands (subjects)
     * LOOKUP - search by device name
         returns ZM_PROTO_DEVICE if found
         returns ZM_PROTO_ERROR if not found
+    * GET-ALL - return all devices
+        return ZM_PROTO_ERROR if there are no devices
+        return M ZM_PROTO_DEVICE messages, where ext have
+        _seq : "N"
+        _cnt : "M"
 
 @end
 */
@@ -373,8 +378,30 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
             zm_proto_encode_error (self->msg, 404, "Requested device does not exists");
     }
     else
+    if (streq (subject, "GET-ALL")) {
+        if (zm_devices_size (self->devices) == 0) {
+            zm_proto_encode_error (self->msg, 404, "No devices");
+            goto send;
+        }
+
+        msg = zm_devices_first (self->devices);
+        zm_proto_ext_set_int (msg, "_cnt", zm_devices_size (self->devices));
+        size_t i = 0;
+        while (msg) {
+            zm_proto_ext_set_int (msg, "_seq", i++);
+            zm_proto_sendto (
+                msg,
+                self->client,
+                mlm_client_sender (self->client),
+                subject);
+            msg = zm_devices_next (self->devices);
+        }
+        return;
+    }
+    else
         zm_proto_encode_error (self->msg, 403, "Subject not found");
 
+send:
     zm_proto_sendto (
         msg,
         self->client,
@@ -502,7 +529,14 @@ zm_device_test (bool verbose)
 
     assert (zm_proto_id (reply) == ZM_PROTO_DEVICE);
     assert (streq (zm_proto_device (reply), "device1"));
+    
+    zreply = zmsg_new ();
+    zmsg_addstr (zreply, "");
+    mlm_client_sendto (writer, "it.zmon.device", "GET-ALL", NULL, 1000, &zreply);
 
+    zm_proto_recv_mlm (reply, writer);
+    zsys_debug ("+================================ GET-ALL =====================");
+    zm_proto_print (reply);
 
     zreply = mlm_client_recv (reader);
     zm_proto_recv (reply, zreply);
