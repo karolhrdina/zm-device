@@ -41,6 +41,10 @@ In this mode actor provide three commands (subjects)
         return M ZM_PROTO_DEVICE messages, where ext have
         _seq : "N"
         _cnt : "M"
+    * PUBLISH-ALL - publish all the devices
+        publish M ZM_PROTO_DEVICE messages, where ext have
+        _seq : "N"
+        _cnt : "M"
 
 @end
 */
@@ -399,6 +403,22 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
         return;
     }
     else
+    if (streq (subject, "PUBLISH-ALL")) {
+
+        msg = zm_devices_first (self->devices);
+        zm_proto_ext_set_int (msg, "_cnt", zm_devices_size (self->devices));
+        size_t i = 0;
+        while (msg) {
+            zm_proto_ext_set_int (msg, "_seq", i++);
+            zm_proto_send_mlm (
+                msg,
+                self->client,
+                subject);
+            msg = zm_devices_next (self->devices);
+        }
+        return;
+    }
+    else
         zm_proto_encode_error (self->msg, 403, "Subject not found");
 
 send:
@@ -543,6 +563,14 @@ zm_device_test (bool verbose)
     zmsg_destroy (&zreply);
     assert (streq (mlm_client_subject (reader), "INSERT"));
     assert (streq (zm_proto_device (reply), "device1"));
+
+    zreply = zmsg_new ();
+    zmsg_addstr (zreply, "");
+    mlm_client_sendto (writer, "it.zmon.device", "PUBLISH-ALL", NULL, 1000, &zreply);
+
+    zm_proto_recv_mlm (reply, reader);
+    zsys_debug ("+================================ PUBLISH-ALL =====================");
+    zm_proto_print (reply);
 
     zm_proto_destroy (&reply);
     
