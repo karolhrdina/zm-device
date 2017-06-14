@@ -554,7 +554,8 @@ zm_device_test (bool verbose)
     zm_proto_sendto (reply, writer, "it.zmon.device", "GET-ALL");
 
     zm_proto_recv_mlm (reply, writer);
-    zm_proto_print (reply);
+    assert (zm_proto_ext_int (reply, "_seq", -1) == 0);
+    assert (zm_proto_ext_int (reply, "_cnt", -1) == 1);
 
     zreply = mlm_client_recv (reader);
     zm_proto_recv (reply, zreply);
@@ -566,7 +567,8 @@ zm_device_test (bool verbose)
     zm_proto_sendto (reply, writer, "it.zmon.device", "PUBLISH-ALL");
 
     zm_proto_recv_mlm (reply, reader);
-    zm_proto_print (reply);
+    assert (zm_proto_ext_int (reply, "_seq", -1) == 0);
+    assert (zm_proto_ext_int (reply, "_cnt", -1) == 1);
 
     zm_proto_destroy (&reply);
     
