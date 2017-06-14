@@ -550,12 +550,10 @@ zm_device_test (bool verbose)
     assert (zm_proto_id (reply) == ZM_PROTO_DEVICE);
     assert (streq (zm_proto_device (reply), "device1"));
     
-    zreply = zmsg_new ();
-    zmsg_addstr (zreply, "");
-    mlm_client_sendto (writer, "it.zmon.device", "GET-ALL", NULL, 1000, &zreply);
+    zm_proto_encode_ok (reply);
+    zm_proto_sendto (reply, writer, "it.zmon.device", "GET-ALL");
 
     zm_proto_recv_mlm (reply, writer);
-    zsys_debug ("+================================ GET-ALL =====================");
     zm_proto_print (reply);
 
     zreply = mlm_client_recv (reader);
@@ -564,12 +562,10 @@ zm_device_test (bool verbose)
     assert (streq (mlm_client_subject (reader), "INSERT"));
     assert (streq (zm_proto_device (reply), "device1"));
 
-    zreply = zmsg_new ();
-    zmsg_addstr (zreply, "");
-    mlm_client_sendto (writer, "it.zmon.device", "PUBLISH-ALL", NULL, 1000, &zreply);
+    zm_proto_encode_ok (reply);
+    zm_proto_sendto (reply, writer, "it.zmon.device", "PUBLISH-ALL");
 
     zm_proto_recv_mlm (reply, reader);
-    zsys_debug ("+================================ PUBLISH-ALL =====================");
     zm_proto_print (reply);
 
     zm_proto_destroy (&reply);
