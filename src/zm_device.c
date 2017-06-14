@@ -36,6 +36,15 @@ In this mode actor provide three commands (subjects)
     * LOOKUP - search by device name
         returns ZM_PROTO_DEVICE if found
         returns ZM_PROTO_ERROR if not found
+    * GET-ALL - return all devices
+        return ZM_PROTO_ERROR if there are no devices
+        return M ZM_PROTO_DEVICE messages, where ext have
+        _seq : "N"
+        _cnt : "M"
+    * PUBLISH-ALL - publish all the devices
+        publish M ZM_PROTO_DEVICE messages, where ext have
+        _seq : "N"
+        _cnt : "M"
 
 @end
 */
@@ -347,12 +356,13 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
     assert (self);
 
     const char *subject = mlm_client_subject (self->client);
-    zmsg_t *msg = zmsg_new ();
+    zm_proto_t *msg = self->msg;    // message to send
+    zm_proto_t *reply = NULL;
+
     if (streq (subject, "INSERT")) {
         zm_devices_insert (self->devices, self->msg);
         zm_device_publish (self, self->msg, subject);
         zm_proto_encode_ok (self->msg);
-        zm_proto_send (self->msg, msg);
     }
     else
     if (streq (subject, "DELETE")) {
@@ -360,31 +370,63 @@ zm_device_recv_mlm_mailbox (zm_device_t *self)
         zm_devices_delete (self->devices, device);
         zm_device_publish (self, self->msg, subject);
         zm_proto_encode_ok (self->msg);
-        zm_proto_send (self->msg, msg);
     }
     else
     if (streq (subject, "LOOKUP")) {
         const char *device = zm_proto_device (self->msg);
-        zm_proto_t *reply = zm_devices_lookup (self->devices, device);
+        reply = zm_devices_lookup (self->devices, device);
 
         if (reply)
-            zm_proto_send (reply, msg);
-        else {
+            msg = reply;
+        else
             zm_proto_encode_error (self->msg, 404, "Requested device does not exists");
-            zm_proto_send (self->msg, msg);
+    }
+    else
+    if (streq (subject, "GET-ALL")) {
+        if (zm_devices_size (self->devices) == 0) {
+            zm_proto_encode_error (self->msg, 404, "No devices");
+            goto send;
         }
+
+        msg = zm_devices_first (self->devices);
+        zm_proto_ext_set_int (msg, "_cnt", zm_devices_size (self->devices));
+        size_t i = 0;
+        while (msg) {
+            zm_proto_ext_set_int (msg, "_seq", i++);
+            zm_proto_sendto (
+                msg,
+                self->client,
+                mlm_client_sender (self->client),
+                subject);
+            msg = zm_devices_next (self->devices);
+        }
+        return;
     }
-    else {
+    else
+    if (streq (subject, "PUBLISH-ALL")) {
+
+        msg = zm_devices_first (self->devices);
+        zm_proto_ext_set_int (msg, "_cnt", zm_devices_size (self->devices));
+        size_t i = 0;
+        while (msg) {
+            zm_proto_ext_set_int (msg, "_seq", i++);
+            zm_proto_send_mlm (
+                msg,
+                self->client,
+                subject);
+            msg = zm_devices_next (self->devices);
+        }
+        return;
+    }
+    else
         zm_proto_encode_error (self->msg, 403, "Subject not found");
-        zm_proto_send (self->msg, msg);
-    }
-    mlm_client_sendto (
+
+send:
+    zm_proto_sendto (
+        msg,
         self->client,
         mlm_client_sender (self->client),
-        "LOOKUP",
-        NULL,
-        5000,
-        &msg);
+        "LOOKUP");
 }
 
 static void
@@ -507,13 +549,24 @@ zm_device_test (bool verbose)
 
     assert (zm_proto_id (reply) == ZM_PROTO_DEVICE);
     assert (streq (zm_proto_device (reply), "device1"));
+    
+    zm_proto_encode_ok (reply);
+    zm_proto_sendto (reply, writer, "it.zmon.device", "GET-ALL");
 
+    zm_proto_recv_mlm (reply, writer);
+    zm_proto_print (reply);
 
     zreply = mlm_client_recv (reader);
     zm_proto_recv (reply, zreply);
     zmsg_destroy (&zreply);
     assert (streq (mlm_client_subject (reader), "INSERT"));
     assert (streq (zm_proto_device (reply), "device1"));
+
+    zm_proto_encode_ok (reply);
+    zm_proto_sendto (reply, writer, "it.zmon.device", "PUBLISH-ALL");
+
+    zm_proto_recv_mlm (reply, reader);
+    zm_proto_print (reply);
 
     zm_proto_destroy (&reply);
     

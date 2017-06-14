@@ -10,8 +10,8 @@
     =========================================================================
 */
 
-#ifndef ZM_ASSET_H_INCLUDED
-#define ZM_ASSET_H_INCLUDED
+#ifndef ZM_DEVICE_H_INCLUDED
+#define ZM_DEVICE_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,11 +41,11 @@ extern "C" {
 //      zstr_sendx (zm_device, "STOP", NULL);
 //
 //  This is the zm_device constructor as a zactor_fn;
-ZM_ASSET_EXPORT void
+ZM_DEVICE_EXPORT void
     zm_device_actor (zsock_t *pipe, void *args);
 
 //  Self test of this actor
-ZM_ASSET_EXPORT void
+ZM_DEVICE_EXPORT void
     zm_device_test (bool verbose);
 //  @end
 

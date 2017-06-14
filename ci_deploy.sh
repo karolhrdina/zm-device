@@ -11,7 +11,7 @@ set -e
 if [ "$BUILD_TYPE" == "default" ]; then
     # Tell travis to deploy all files in dist
     mkdir dist
-    export ZM_ASSET_DEPLOYMENT=dist/*
+    export ZM_DEVICE_DEPLOYMENT=dist/*
     # Move archives to dist
     mv *.tar.gz dist
     mv *.zip dist
@@ -23,7 +23,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
 elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
     ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./gradlew clean bintrayUpload )
     cp bindings/jni/android/zm_device-android.jar zm_device-android-1.0.0.jar
-    export ZM_ASSET_DEPLOYMENT=zm_device-android-1.0.0.jar
+    export ZM_DEVICE_DEPLOYMENT=zm_device-android-1.0.0.jar
 else
-    export ZM_ASSET_DEPLOYMENT=""
+    export ZM_DEVICE_DEPLOYMENT=""
 fi

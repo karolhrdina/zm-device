@@ -20,11 +20,11 @@ PV_MAJOR=`echo $PACKAGE_VERSION | cut -d . -f 1`
 PV_MINOR=`echo $PACKAGE_VERSION | cut -d . -f 2`
 PV_PATCH=`echo $PACKAGE_VERSION | cut -d . -f 3`
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_MAJOR],[$PV_MAJOR],
-    [ZM_ASSET major version])
+    [ZM_DEVICE major version])
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_MINOR],[$PV_MINOR],
-    [ZM_ASSET minor version])
+    [ZM_DEVICE minor version])
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_PATCH],[$PV_PATCH],
-    [ZM_ASSET patchlevel])
+    [ZM_DEVICE patchlevel])
 # This lets us use PACKAGE_VERSION in Makefiles
 AC_SUBST(PACKAGE_VERSION)
 
@@ -40,7 +40,7 @@ LTVER="1:0:0"
 AC_SUBST(LTVER)
 
 # Capture c flags
-ZM_ASSET_ORIG_CFLAGS="${CFLAGS:-none}"
+ZM_DEVICE_ORIG_CFLAGS="${CFLAGS:-none}"
 
 # Checks for programs
 AC_PROG_CC
@@ -56,13 +56,13 @@ PKG_PROG_PKG_CONFIG
 AC_MSG_CHECKING([whether to enable GCov])
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting])],
-                  [ZM_ASSET_GCOV="$withval"])
+                  [ZM_DEVICE_GCOV="$withval"])
 
-if test "x${ZM_ASSET_GCOV}" == "xyes"; then
+if test "x${ZM_DEVICE_GCOV}" == "xyes"; then
     CFLAGS="-O0 -g -fprofile-arcs -ftest-coverage"
 
-    if test "x${ZM_ASSET_ORIG_CFLAGS}" != "xnone"; then
-        CFLAGS="${CFLAGS} ${ZM_ASSET_ORIG_CFLAGS}"
+    if test "x${ZM_DEVICE_ORIG_CFLAGS}" != "xnone"; then
+        CFLAGS="${CFLAGS} ${ZM_DEVICE_ORIG_CFLAGS}"
     fi
     AM_CONDITIONAL(WITH_GCOV, true)
     AC_MSG_RESULT([yes])
@@ -75,9 +75,9 @@ fi
 AC_MSG_CHECKING([whether to enable ASan])
 AC_ARG_ENABLE(address-sanitizer, [AS_HELP_STRING([--enable-address-sanitizer=yes/no],
                   [Build with GCC Address Sanitizer instrumentation])],
-                  [ZM_ASSET_ASAN="$enableval"])
+                  [ZM_DEVICE_ASAN="$enableval"])
 
-if test "x${ZM_ASSET_ASAN}" == "xyes"; then
+if test "x${ZM_DEVICE_ASAN}" == "xyes"; then
     CFLAGS="${CFLAGS} -fsanitize=address"
     CXXFLAGS="${CXXFLAGS} -fsanitize=address"
 
@@ -497,7 +497,7 @@ else
         # Tarballs built with 'make dist' ship with prebuilt documentation.
         if ! test -f doc/zm-device.7; then
             zm_device_install_man="no"
-            AC_MSG_WARN([You are building an unreleased version of ZM-ASSET and asciidoc or xmlto are not installed.])
+            AC_MSG_WARN([You are building an unreleased version of ZM-DEVICE and asciidoc or xmlto are not installed.])
             AC_MSG_WARN([Documentation will not be built and manual pages will not be installed.])
         fi
     fi
@@ -508,19 +508,19 @@ AC_MSG_CHECKING([whether to install manpages])
 AC_MSG_RESULT([$zm_device_install_man])
 
 # Set some default features required by libzm_device code.
-CPPFLAGS="-DZM_ASSET_INTERNAL_BUILD -D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
+CPPFLAGS="-DZM_DEVICE_INTERNAL_BUILD -D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
 
 # OS-specific tests
 case "${host_os}" in
     *linux*)
         # Define on Linux to enable all library features
         CPPFLAGS="-D_GNU_SOURCE -DLINUX $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_LINUX, 1, [Have Linux OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_LINUX, 1, [Have Linux OS])
         zm_device_on_linux="yes"
 
         case "${host_os}" in
             *android*)
-                AC_DEFINE(ZM_ASSET_HAVE_ANDROID, 1, [Have Android OS])
+                AC_DEFINE(ZM_DEVICE_HAVE_ANDROID, 1, [Have Android OS])
                 zm_device_on_android="yes"
             ;;
         esac
@@ -530,43 +530,43 @@ case "${host_os}" in
         CPPFLAGS="-D_PTHREADS $CPPFLAGS"
         # Allow definitions of common OS-provided functions that are not in old standards
         CPPFLAGS="-D__EXTENSIONS__ $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_SOLARIS, 1, [Have Solaris OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_SOLARIS, 1, [Have Solaris OS])
         CFLAGS="${CFLAGS} -lsocket -lssp"
         ;;
     *freebsd*)
         # Define on FreeBSD to enable all library features
         CPPFLAGS="-D__BSD_VISIBLE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_FREEBSD, 1, [Have FreeBSD OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_FREEBSD, 1, [Have FreeBSD OS])
         ;;
     *darwin*)
         # Define on Darwin to enable all library features
         CPPFLAGS="-D_DARWIN_C_SOURCE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_OSX, 1, [Have DarwinOSX OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_OSX, 1, [Have DarwinOSX OS])
         ;;
     *netbsd*)
         # Define on NetBSD to enable all library features
         CPPFLAGS="-D_NETBSD_SOURCE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_NETBSD, 1, [Have NetBSD OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_NETBSD, 1, [Have NetBSD OS])
         ;;
     *openbsd*)
         # Define on OpenBSD to enable all library features
         CPPFLAGS="-D_BSD_SOURCE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_OPENBSD, 1, [Have OpenBSD OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_OPENBSD, 1, [Have OpenBSD OS])
         ;;
     *nto-qnx*)
-        AC_DEFINE(ZM_ASSET_HAVE_QNXNTO, 1, [Have QNX Neutrino OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_QNXNTO, 1, [Have QNX Neutrino OS])
         ;;
     *aix*)
-        AC_DEFINE(ZM_ASSET_HAVE_AIX, 1, [Have AIX OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_AIX, 1, [Have AIX OS])
         ;;
     *hpux*)
         # Define on HP-UX to enable all library features
         CPPFLAGS="-D_POSIX_C_SOURCE=200112L"
-        AC_DEFINE(ZM_ASSET_HAVE_HPUX, 1, [Have HPUX OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_HPUX, 1, [Have HPUX OS])
         ;;
     *mingw32*)
-        AC_DEFINE(ZM_ASSET_HAVE_WINDOWS, 1, [Have Windows OS])
-        AC_DEFINE(ZM_ASSET_HAVE_MINGW32, 1, [Have MinGW32])
+        AC_DEFINE(ZM_DEVICE_HAVE_WINDOWS, 1, [Have Windows OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_MINGW32, 1, [Have MinGW32])
         AC_CHECK_HEADERS(windows.h)
         zm_device_on_mingw32="yes"
         zm_device_install_man="no"
@@ -575,8 +575,8 @@ case "${host_os}" in
         # Define on MINGW64 to enable all libeary features
         # Disable format error due to incomplete ANSI C
         CPPFLAGS="-Wno-error=format -D_XOPEN_SOURCE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_WINDOWS, 1, [Have Windows OS])
-        AC_DEFINE(ZM_ASSET_HAVE_MINGW32, 1, [Have MinGW32])
+        AC_DEFINE(ZM_DEVICE_HAVE_WINDOWS, 1, [Have Windows OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_MINGW32, 1, [Have MinGW32])
         AC_CHECK_HEADERS(windows.h)
         zm_device_on_mingw32="yes"
         zm_device_install_man="no"
@@ -584,7 +584,7 @@ case "${host_os}" in
     *cygwin*)
         # Define on Cygwin to enable all library features
         CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
-        AC_DEFINE(ZM_ASSET_HAVE_CYGWIN, 1, [Have Cygwin])
+        AC_DEFINE(ZM_DEVICE_HAVE_CYGWIN, 1, [Have Cygwin])
         zm_device_on_cygwin="yes"
         ;;
     gnu*)
@@ -592,7 +592,7 @@ case "${host_os}" in
         if test "x$GXX" = "xyes"; then
             CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
         fi
-        AC_DEFINE(ZM_ASSET_HAVE_GNU, 1, [Have GNU/Hurd OS])
+        AC_DEFINE(ZM_DEVICE_HAVE_GNU, 1, [Have GNU/Hurd OS])
         zm_device_on_gnu="yes"
         ;;
     *)
@@ -658,8 +658,8 @@ AC_ARG_ENABLE([zmdevice],
     [enable_zmdevice=$enableval],
     [enable_zmdevice=yes])
 
-AM_CONDITIONAL([ENABLE_ZMASSET], [test x$enable_zmdevice != xno])
-AM_COND_IF([ENABLE_ZMASSET], [AC_MSG_NOTICE([ENABLE_ZMASSET defined])])
+AM_CONDITIONAL([ENABLE_ZMDEVICE], [test x$enable_zmdevice != xno])
+AM_COND_IF([ENABLE_ZMDEVICE], [AC_MSG_NOTICE([ENABLE_ZMDEVICE defined])])
 
 # Check for zm_device_selftest intent
 AC_ARG_ENABLE([zm_device_selftest],
@@ -668,8 +668,8 @@ AC_ARG_ENABLE([zm_device_selftest],
     [enable_zm_device_selftest=$enableval],
     [enable_zm_device_selftest=yes])
 
-AM_CONDITIONAL([ENABLE_ZM_ASSET_SELFTEST], [test x$enable_zm_device_selftest != xno])
-AM_COND_IF([ENABLE_ZM_ASSET_SELFTEST], [AC_MSG_NOTICE([ENABLE_ZM_ASSET_SELFTEST defined])])
+AM_CONDITIONAL([ENABLE_ZM_DEVICE_SELFTEST], [test x$enable_zm_device_selftest != xno])
+AM_COND_IF([ENABLE_ZM_DEVICE_SELFTEST], [AC_MSG_NOTICE([ENABLE_ZM_DEVICE_SELFTEST defined])])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
@@ -711,8 +711,8 @@ AM_CONDITIONAL([ENABLE_DRAFTS], [test x$enable_drafts != xno])
 
 if test "x$enable_drafts" = "xyes"; then
     AC_MSG_NOTICE([Building stable and legacy API + draft API])
-    AC_DEFINE(ZM_ASSET_BUILD_DRAFT_API, 1, [Provide draft classes and methods])
-    AC_SUBST(pkg_config_defines, "-DZM_ASSET_BUILD_DRAFT_API=1")
+    AC_DEFINE(ZM_DEVICE_BUILD_DRAFT_API, 1, [Provide draft classes and methods])
+    AC_SUBST(pkg_config_defines, "-DZM_DEVICE_BUILD_DRAFT_API=1")
 else
     AC_MSG_NOTICE([Building stable and legacy API (no draft API)])
     AC_SUBST(pkg_config_defines, "")
