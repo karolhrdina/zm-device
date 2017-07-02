@@ -22,7 +22,7 @@
 Name:           zm-device
 Version:        1.0.0
 Release:        1
-Summary:        Device management component
+Summary:        asset management component
 License:        MIT
 URL:            http://example.com/
 Source0:        %{name}-%{version}.tar.gz
@@ -47,10 +47,18 @@ BuildRequires:  zm-proto-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
-zm-device device management component.
+zm-device asset management component.
 
 
 %prep
+#FIXME: %{error:...} did not worked for me
+%if %{with python_cffi}
+%if %{without drafts}
+echo "FATAL: python_cffi not yet supported w/o drafts"
+exit 1
+%endif
+%endif
+
 %setup -q
 
 %build
